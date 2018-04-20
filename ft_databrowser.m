@@ -172,6 +172,7 @@ cfg = ft_checkconfig(cfg, 'createsubcfg',  {'preproc'});
 
 % set the defaults
 cfg.ylim            = ft_getopt(cfg, 'ylim', 'maxabs');
+cfg.trlop           = ft_getopt(cfg, 'trlop', 1);
 cfg.artfctdef       = ft_getopt(cfg, 'artfctdef', struct);
 cfg.selectfeature   = ft_getopt(cfg, 'selectfeature', 'visual');     % string or cell-array
 cfg.selectmode      = ft_getopt(cfg, 'selectmode', 'markartifact');
@@ -588,8 +589,8 @@ end
 opt.artdata     = artdata;
 opt.hdr         = hdr;
 opt.event       = event;
-opt.trlop       = 1;          % the active trial being displayed
-opt.ftsel       = find(strcmp(artlabel, cfg.selectfeature)); % current artifact/feature being selected
+opt.trlop       = cfg.trlop;          % the active trial being displayed
+opt.ftsel       = find(strcmp(artlabel,cfg.selectfeature)); % current artifact/feature being selected
 opt.trlorg      = trlorg;
 opt.fsample     = hdr.Fs;
 opt.artifactcolors = [0.9686 0.7608 0.7686; 0.7529 0.7098 0.9647; 0.7373 0.9725 0.6824; 0.8118 0.8118 0.8118; 0.9725 0.6745 0.4784; 0.9765 0.9176 0.5686; 0.6863 1 1; 1 0.6863 1; 0 1 0.6000];
