@@ -130,7 +130,7 @@ ft_info('removing %d components\n', length(reject));
 if ~hasdata
   ft_info('keeping %d components\n',  ncomps-length(reject));
 else
-  ft_info('keeping %d components\n',  nchans-length(reject));
+  ft_info('keeping %d components\n',  ncomps-length(reject));
 end
 
 % create a projection matrix by subtracting the subspace spanned by the
