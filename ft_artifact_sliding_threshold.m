@@ -1,4 +1,4 @@
-function [cfg, artifact,badwin] = ft_artifact_sliding_threshold(cfg, data)
+function [cfg, artifact,badwin,measurerange] = ft_artifact_sliding_threshold(cfg, data)
 
 % FT_ARTIFACT_SLIDING_THRESHOLD scans for time points in which the range, 
 % (min-max difference) of the signal in any within a sliding time window
@@ -152,6 +152,7 @@ numtrl      = size(cfg.trl,1);
 channel     = ft_channelselection(artfctdef.channel, hdr.label);
 channelindx = match_str(hdr.label,channel);
 artifact    = [];
+measurerange = [];
 
 for trlop = 1:numtrl
   if hasdata
@@ -198,6 +199,7 @@ for trlop = 1:numtrl
       end
   elseif strcmp(artfctdef.method,'window')
       artifact(end+1:end+n,:) = [allwins(badwin) allwine(badwin)];
+      measurerange(end+1:end+n) = r(badwin);
   else
       error('Unknown method');
   end
@@ -213,6 +215,7 @@ cfg.artfctdef.slidethresh.wins     = wins;
 cfg.artfctdef.slidethresh.trl      = cfg.trl;         % trialdefinition prior to rejection
 cfg.artfctdef.slidethresh.channel  = channel;         % exact channels used for detection
 cfg.artfctdef.slidethresh.artifact = artifact;        % detected artifacts
+cfg.artfctdef.slidethresh.measurerange = measurerange;     % not sure. debug
 
 % do the general cleanup and bookkeeping at the end of the function
 ft_postamble provenance
