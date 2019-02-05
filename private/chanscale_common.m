@@ -101,8 +101,8 @@ switch dimord
       dat(chansel,:,:) = dat(chansel,:,:) .* cfg.emgscale;
     end
     if ~isempty(cfg.megscale)
-      chansel = match_str(data.label, ft_channelselection('MEG', data.label, senstype));
-      ft_info('applying cfg.megscale to %d channels', numel(chansel));
+      type = data.hdr.grad.type;
+      chansel = match_str(data.label, ft_channelselection('MEG', data.label, type));
       dat(chansel,:,:) = dat(chansel,:,:) .* cfg.megscale;
     end
     if ~isempty(cfg.megrefscale)
@@ -169,8 +169,8 @@ switch dimord
         dat(chansel,:) = dat(chansel,:) .* cfg.emgscale;
       end
       if ~isempty(cfg.megscale)
-        chansel = match_str(data.label, ft_channelselection('MEG', data.label, senstype));
-        ft_info('applying cfg.megscale to %d channels', numel(chansel));
+        type = data.hdr.grad.type;
+        chansel = match_str(data.label, ft_channelselection('MEG', data.label, type));
         dat(chansel,:) = dat(chansel,:) .* cfg.megscale;
       end
       if ~isempty(cfg.megrefscale)
