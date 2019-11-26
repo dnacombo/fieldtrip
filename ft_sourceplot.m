@@ -51,6 +51,7 @@ function ft_sourceplot(cfg, functional, anatomical)
 %   cfg.atlas         = string, filename of atlas to use (default = []) see FT_READ_ATLAS
 %                        for ROI masking (see 'masking' below) or for orthogonal plots (see method='ortho' below)
 %   cfg.visible       = string, 'on' or 'off', whether figure will be visible (default = 'on')
+%   cfg.hfig          = figure handle 
 %
 % The following parameters can be used for the functional data:
 %   cfg.funcolormap   = colormap for functional data, see COLORMAP (default = 'auto')
@@ -300,6 +301,7 @@ cfg.colorbartext  = ft_getopt(cfg, 'colorbartext',  '');
 cfg.voxelratio    = ft_getopt(cfg, 'voxelratio',    'data'); % display size of the voxel, 'data' or 'square'
 cfg.axisratio     = ft_getopt(cfg, 'axisratio',     'data'); % size of the axes of the three orthoplots, 'square', 'voxel', or 'data'
 cfg.visible       = ft_getopt(cfg, 'visible',       'on');
+cfg.hfig          = ft_getopt(cfg, 'hfig',          []);
 cfg.clim          = ft_getopt(cfg, 'clim',          [0 1]); % this is used to scale the orthoplot
 cfg.intersectmesh = ft_getopt(cfg, 'intersectmesh');
 
@@ -712,7 +714,11 @@ if ~hasroi
 end
 
 %% start building the figure
-h = figure('visible', cfg.visible);
+if ishandle(cfg.hfig)
+    h = figure(cfg.hfig);
+else
+    h = figure('visible', cfg.visible);
+end
 set(h, 'color', [1 1 1]);
 set(h, 'renderer', cfg.renderer);
 if ~isempty(cfg.figurename)
