@@ -3,7 +3,7 @@ function smap = ft_sensitivitymap(cfg,leadfield)
 % FT_SENSITIVITYMAP Compute sensitivity map.
 % 
 % Such maps are used to know how much sources are visible by a type of
-% sensor, and how much components shadow some sources. 
+% sensor, and how much projections shadow some sources. 
 %
 % Use as
 %   [smap] = ft_sensitivitymap(cfg, leadfield)
@@ -13,9 +13,11 @@ function smap = ft_sensitivitymap(cfg,leadfield)
 %     cfg.mode          The type of sensitivity map computed. See manual.
 %                       Should be 'free', 'fixed', 'ratio', 'radiality',
 %                       ['angle', 'remaining', or 'dampening'] NOT IMPLEMENTED
+%     cfg.projslist     List of projection vectors.
 %     cfg.ch_type       'grad' | 'mag' | 'eeg'
 %     cfg.excludelist   List of channels to exclude. If empty do not
-%                       exclude any (default).  
+%                       exclude any (default). If 'bads', exclude channels
+%                       in fwd['info']['bads'].  
 % 
 % 
 % See also 
@@ -38,8 +40,11 @@ end
 
 % set the defaults
 cfg.mode      = ft_getopt(cfg, 'mode',         'fixed');
+cfg.projlist  = ft_getopt(cfg, 'projlist',     []);
 cfg.ch_type   = ft_getopt(cfg, 'ch_type',      '');
 cfg.excludelist= ft_getopt(cfg, 'excludelist', 'fixed');
+
+% don't know how the projlist variable should be created/accounted for...
 
 for i_s = 1:numel(leadfield.leadfield)
     g = leadfield.leadfield{i_s};

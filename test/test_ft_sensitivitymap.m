@@ -63,7 +63,7 @@ cfg.preproc.baselinewindow = [-0.2 0];
 cfg.preproc.demean = 'yes';
 cfg.covariance     = 'yes';
 tlckw              = ft_timelockanalysis(cfg, dataw_meg);
-%%
+
 % obtain the necessary ingredients for obtaining a forward model
 load(fullfile(subj.outputpath, 'anatomy', subj.name, sprintf('%s_headmodel', subj.name)));
 load(fullfile(subj.outputpath, 'anatomy', subj.name, sprintf('%s_sourcemodel', subj.name)));
@@ -71,7 +71,7 @@ headmodel   = ft_convert_units(headmodel,tlckw.grad.unit);
 sourcemodel = ft_convert_units(sourcemodel,tlckw.grad.unit);
 sourcemodel.inside = sourcemodel.atlasroi>0;
 
-%% compute the forward model for the whitened data
+% compute the forward model for the whitened data
 cfg             = [];
 cfg.channel     = tlckw.label;
 cfg.grad        = tlckw.grad;
@@ -81,6 +81,7 @@ cfg.method      = 'singleshell';
 cfg.singleshell.batchsize = 1000;
 leadfield_meg   = ft_prepare_leadfield(cfg); % NOTE: input of the whitened data ensures the correct sensor definition to be used
 
+%% sensitivity map
 leadfield_meg.smap = ft_sensitivitymap([],leadfield_meg);
 
 %%
