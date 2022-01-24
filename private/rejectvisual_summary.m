@@ -164,6 +164,9 @@ info.output_box = uicontrol(h, 'Units', 'normalized', 'position', [0.00 0.00 1.0
 % quit button
 uicontrol(h, 'Units', 'normalized', 'position', [0.80 0.175 0.10 0.05], 'string', 'quit', 'callback', @quit);
 
+info.cm = uicontextmenu(h);
+m1 = uimenu(info.cm,'Text','Plot Trial', 'MenuSelectedFcn',@plot_trial);
+% m2 = uimenu(info.cm,'Text','Plot Channel', 'MenuSelectedFcn',@plot_channel);
 guidata(h, info);
 
 % Compute initial metric...
@@ -258,10 +261,10 @@ switch info.cfg.viewmode
     tmp = level;
     tmp(~info.chansel, :) = nan;
     tmp(:, ~info.trlsel)  = nan;
-    imagesc(tmp, 'AlphaData', ~isnan(tmp));
+    him = imagesc(tmp, 'AlphaData', ~isnan(tmp));
     caxis([min(tmp(:)) max(tmp(:))]);
   case 'hide'
-    imagesc(level(info.chansel==1, info.trlsel==1));
+    him = imagesc(level(info.chansel==1, info.trlsel==1));
     if ~all(info.trlsel)
       set(info.axes(1), 'Xtick', []);
     end
@@ -269,6 +272,7 @@ switch info.cfg.viewmode
       set(info.axes(1), 'Ytick', []);
     end
 end % switch
+set(him, 'ContextMenu', info.cm)
 axis ij;
 % colorbar;
 title(info.cfg.method);
@@ -695,3 +699,46 @@ elseif range(3)==range(4)
     range([3 4]) = range([3 4]) + [-eps +eps]*range(3);
   end
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function plot_trial(h, eventdata)
+info = guidata(h);
+
+
+pos = get(gca,'currentpoint');
+pos = [round(pos(1,1)) round(pos(1,2))];
+
+update_log(info.output_box, sprintf('Databrowse from trial %d.', pos(1)));
+
+cfg = [];
+cfg.continuous = 'no';
+cfg.viewmode = 'butterfly';
+cfg.trlop = pos(1);
+cfg.blocksize = [max(cellfun(@range,info.data.time))];
+l(1) = min(info.data.trial{cfg.trlop}(:));
+l(2) = max(info.data.trial{cfg.trlop}(:));
+scalefac = 10.^(fix(log10(max(abs(l)))));
+if l(1) < 0
+    l = max(abs(l));
+    l = (round(l / scalefac * 100) / 100) * scalefac;
+    cfg.ylim = [-l l]/10;
+else
+    l = (round(l(2) / scalefac * 100) / 100) * scalefac;
+    cfg.ylim = [0 l]/10;
+end
+
+cfg.preproc = info.cfg.preproc;
+cfg.event = info.cfg.event;
+cfg.layout = info.cfg.layout;
+cfg.ploteventlabel = 'no';
+cfg.artfctdef = info.cfg.artfctdef;
+nucfg = ft_databrowser(cfg,info.data);
+info.cfg.artfctdef = nucfg.artfctdef;
+guidata(h, info);
+
+figure(parentfigure(h));
+update_log(info.output_box, 'Done.');
