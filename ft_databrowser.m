@@ -187,6 +187,7 @@ cfg.zlim                = ft_getopt(cfg, 'zlim', 'maxmin');
 cfg.artfctdef           = ft_getopt(cfg, 'artfctdef', struct);
 cfg.selectmode          = ft_getopt(cfg, 'selectmode', 'markartifact');
 cfg.blocksize           = ft_getopt(cfg, 'blocksize');                 % now used for both continuous and non-continuous data, defaulting done below
+cfg.trlop               = ft_getopt(cfg, 'trlop', 1);
 cfg.preproc             = ft_getopt(cfg, 'preproc');                   % see preproc for options
 cfg.selfun              = ft_getopt(cfg, 'selfun');                    % default functions are 'simpleFFT', 'multiplotER', 'topoplotER', 'topoplotVAR', 'movieplotER'
 cfg.selcfg              = ft_getopt(cfg, 'selcfg');                    % defaulting done below, requires layouts/etc to be processed
@@ -648,7 +649,7 @@ else
   opt.trialviewtype = 'trial';
 end
 opt.hdr             = hdr;
-opt.trlop           = 1;          % the active trial being displayed
+opt.trlop           = cfg.trlop;  % the active trial being displayed
 opt.artsel          = 1;          % the currently selected artifact/feature
 opt.trlorg          = trlorg;
 opt.fsample         = hdr.Fs;
