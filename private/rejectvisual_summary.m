@@ -145,12 +145,16 @@ uicontrol(h, 'Units', 'normalized', 'position', [0.630 0.300 0.14 0.05], 'Style'
 
 % editbox for trial plotting
 uicontrol(h, 'Units', 'normalized', 'position', [0.630 0.210 0.14 0.05], 'Style', 'text', 'HorizontalAlignment', 'left', 'backgroundcolor', get(h, 'color'), 'string', 'Plot trial:');
-info.plottrltxt = uicontrol(h, 'Units', 'normalized', 'position', [0.630 0.170 0.14 0.05], 'Style', 'edit', 'HorizontalAlignment', 'left', 'backgroundcolor', [1 1 1], 'callback', @display_trial);
+info.plottrltxt = uicontrol(h, 'Units', 'normalized', 'position', [0.630 0.170 0.14 0.05], 'Style', 'edit', 'HorizontalAlignment', 'left', 'backgroundcolor', [1 1 1]);
 
 info.excludetrllbl  = uicontrol(h, 'Units', 'normalized', 'position', [0.795 0.470 0.210 0.05], 'Style', 'text', 'HorizontalAlignment', 'left', 'backgroundcolor', get(h, 'color'), 'string', sprintf('Rejected trials: %i/%i', sum(info.trlsel==0), info.ntrl));
 info.excludetrltxt  = uicontrol(h, 'Units', 'normalized', 'position', [0.795 0.330 0.210 0.15], 'Style', 'text', 'HorizontalAlignment', 'left', 'backgroundcolor', get(h, 'color'), 'Enable', 'Inactive');
 info.excludechanlbl = uicontrol(h, 'Units', 'normalized', 'position', [0.795 0.340 0.210 0.05], 'Style', 'text', 'HorizontalAlignment', 'left', 'backgroundcolor', get(h, 'color'), 'string', sprintf('Rejected channels: %i/%i', sum(info.chansel==0), info.nchan));
 info.excludechantxt = uicontrol(h, 'Units', 'normalized', 'position', [0.795 0.200 0.210 0.15], 'Style', 'text', 'HorizontalAlignment', 'left', 'backgroundcolor', get(h, 'color'), 'Enable', 'Inactive');
+
+% plot-trial and browse button
+uicontrol(h, 'Units', 'normalized', 'position', [0.795 0.21 0.08 0.04], 'string', 'plot', 'callback', @display_trial);
+uicontrol(h, 'Units', 'normalized', 'position', [0.795 0.16 0.08 0.04], 'string', 'browse', 'callback', @browse_trial);
 
 % "show rejected" button
 % ui_tog = uicontrol(h, 'Units', 'normalized', 'position', [0.55 0.200 0.25 0.05], 'Style', 'checkbox', 'backgroundcolor', get(h, 'color'), 'string', 'Show rejected?', 'callback', @toggle_rejected);
@@ -162,7 +166,7 @@ info.excludechantxt = uicontrol(h, 'Units', 'normalized', 'position', [0.795 0.2
 info.output_box = uicontrol(h, 'Units', 'normalized', 'position', [0.00 0.00 1.00 0.15], 'Style', 'edit', 'HorizontalAlignment', 'left', 'Max', 3, 'Min', 1, 'Enable', 'inactive', 'FontName', get(0, 'FixedWidthFontName'), 'FontSize', 9, 'ForegroundColor', [0 0 0], 'BackgroundColor', [1 1 1]);
 
 % quit button
-uicontrol(h, 'Units', 'normalized', 'position', [0.80 0.175 0.10 0.05], 'string', 'quit', 'callback', @quit);
+uicontrol(h, 'Units', 'normalized', 'position', [0.89 0.175 0.10 0.05], 'string', 'quit', 'callback', @quit);
 
 guidata(h, info);
 
@@ -641,8 +645,8 @@ maxpertrl  = extreme(level, [], 1);
 function display_trial(h, eventdata)
 info = guidata(h);
 update_log(info.output_box, 'Making multiplot of individual trials ...');
-rawtrls = get(h, 'string');
-set(h, 'string', '');
+rawtrls = get(info.plottrltxt, 'string');
+% set(info.plottrltxt, 'string', '');
 if isempty(rawtrls)
   return;
 else
@@ -705,3 +709,47 @@ elseif range(3)==range(4)
     range([3 4]) = range([3 4]) + [-eps +eps]*range(3);
   end
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SUBFUNCTION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function browse_trial(h, eventdata)
+info = guidata(h);
+
+
+tri = get(info.plottrltxt,'String');
+tri = regexp(tri,'\d+','match');
+tri = cellfun(@(x)str2double(num2str(x)),tri);
+if isempty(tri)
+  return
+end
+tri = tri(1);
+update_log(info.output_box, sprintf('Databrowse from trial %d.', tri));
+
+cfg = [];
+cfg.continuous = 'no';
+cfg.viewmode = 'butterfly';
+cfg.trlop = tri;
+cfg.blocksize = [max(cellfun(@range,info.data.time))];
+l(1) = min(info.data.trial{cfg.trlop}(:));
+l(2) = max(info.data.trial{cfg.trlop}(:));
+scalefac = 10.^(fix(log10(max(abs(l)))));
+if l(1) < 0
+    l = max(abs(l));
+    l = (round(l / scalefac * 100) / 100) * scalefac;
+    cfg.ylim = [-l l];
+else
+    l = (round(l(2) / scalefac * 100) / 100) * scalefac;
+    cfg.ylim = [0 l];
+end
+cfg.preproc = info.cfg.preproc;
+cfg.event = info.cfg.event;
+cfg.layout = info.cfg.layout;
+cfg.ploteventlabel = 'no';
+cfg.artfctdef = info.cfg.artfctdef;
+nucfg = ft_databrowser(cfg,info.data);
+info.cfg.artfctdef = nucfg.artfctdef;
+guidata(h, info);
+
+figure(parentfigure(h));
+update_log(info.output_box, 'Done.');
