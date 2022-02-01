@@ -748,7 +748,9 @@ cfg.preproc = info.cfg.preproc;
 cfg.event = info.cfg.event;
 cfg.layout = info.cfg.layout;
 cfg.ploteventlabel = 'no';
-cfg.artfctdef = info.cfg.artfctdef;
+if isfield(info.cfg,'artfctdef')
+  cfg.artfctdef = info.cfg.artfctdef;
+end
 nucfg = ft_databrowser(cfg,info.data);
 info.cfg.artfctdef = nucfg.artfctdef;
 guidata(h, info);
