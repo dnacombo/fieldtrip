@@ -670,6 +670,8 @@ opt.eventtypes      = eventtypes;
 opt.eventcolors     = eventcolors;
 opt.nanpaddata      = []; % this is used to allow horizontal scaling to be constant (when looking at last segment continuous data, or when looking at segmented/zoomed-out non-continuous data)
 opt.trllock         = []; % this is used when zooming into trial based data
+opt.redraw_cb       = @redraw_cb;
+opt.preproc         = cfg.preproc;
 
 % save original layout when viewmode = component
 if strcmp(cfg.viewmode, 'component')
