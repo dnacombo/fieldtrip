@@ -819,6 +819,11 @@ if nargout
   while ishandle(h)
     uiwait(h);
     opt = getappdata(h, 'opt');
+    % add the updated preproc to the output
+    try
+      browsecfg = getappdata(h, 'cfg');
+      cfg.preproc = browsecfg.preproc;
+    end
     if opt.cleanup
       delete(h);
     end
@@ -829,11 +834,6 @@ if nargout
     cfg.artfctdef.(opt.artdata.label{i}).artifact = boolvec2artifact(opt.artdata.trial{1}(i,:));
   end
 
-  % add the updated preproc to the output
-  try
-    browsecfg = getappdata(h, 'cfg');
-    cfg.preproc = browsecfg.preproc;
-  end
 
   % add the updated events to the output cfg
   cfg.event = opt.event;
