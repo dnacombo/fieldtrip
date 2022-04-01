@@ -66,12 +66,9 @@ for i = 1:numel(boundarysample)
   boundary(i).sample = boundarysample(i);
   boundary(i).offset = [];
   boundary(i).duration = 0;
-  if isfield(event,'timestamp')
-      boundary(i).timestamp = boundary(i).sample / data.fsample;
-  end
   boundary(i).ursample = NaN;
 end
-event = [event boundary];
+event = appendstruct(event, boundary);
 event = sortstruct(event,'sample');
 
 %%%%%%%%%%% now dealing with artfctdef
